@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1001001295938",
+    "project_id": "task-organizer-1f0ae",
+    "storage_bucket": "task-organizer-1f0ae.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001001295938:android:19ce21d7a7e1410fb84ddb",
+        "android_client_info": {
+          "package_name": "com.example.task_organizer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJ4q0EbjjQqr4hv8BdLjSaiw68sJWRq_k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
