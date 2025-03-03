@@ -31,4 +31,4 @@ Task Organizer — это мобильное приложение для упр�
 
    ```bash
    git clone https://github.com/pashaxd/task_organizer.git
-   cd task-organizer
+   cd task_organizer
