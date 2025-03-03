@@ -1,13 +1,15 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:task_organizer/features/task_feature/presentation/widgets/task_field.dart';
 import 'package:uuid/uuid.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:intl/intl.dart';
 
 import '../bloc/task_bloc.dart';
+
+/// Экран для управления задачами.
 
 class TaskScreen extends StatefulWidget {
   const TaskScreen({super.key});
@@ -17,17 +19,19 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  DateTime? dueDate;
+  final TextEditingController titleController = TextEditingController(); // Контроллер для заголовка задачи
+  final TextEditingController descriptionController = TextEditingController(); // Контроллер для описания задачи
+  DateTime? dueDate; // Дата выполнения задачи
+  bool sortByDate = false; // Флаг для сортировки по дате
 
   @override
   void initState() {
     super.initState();
-    context.read<TaskBloc>().add(GetTaskList());
-    tz.initializeTimeZones();
+    context.read<TaskBloc>().add(GetTaskList()); // Запрос списка задач при инициализации
+    tz.initializeTimeZones(); // Инициализация временных зон
   }
 
+  /// Открывает диалог выбора даты выполнения задачи.
   Future<void> _selectDueDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -54,6 +58,7 @@ class _TaskScreenState extends State<TaskScreen> {
     }
   }
 
+  /// Открывает диалог для добавления новой задачи.
   void _addingTask() {
     showDialog(
       context: context,
@@ -65,21 +70,27 @@ class _TaskScreenState extends State<TaskScreen> {
               children: [
                 IconButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(context).pop(); // Закрытие диалога
                   },
-                  icon: Icon(Icons.close),
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.black,
+                  ),
                 ),
                 TaskField(
                   controller: titleController,
-                  hintText: 'Write the title',
+                  hintText: 'Write the title', // Подсказка для заголовка
                 ),
-                SizedBox(height: 16.0),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 TaskField(
                   controller: descriptionController,
-                  hintText: 'Write the description',
+                  hintText: 'Write the description', // Подсказка для описания
                 ),
-                SizedBox(height: 16.0),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                 ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                      MaterialStateProperty.all(Colors.lightGreenAccent)),
                   onPressed: () async {
                     if (titleController.text.isEmpty ||
                         descriptionController.text.isEmpty) {
@@ -93,17 +104,17 @@ class _TaskScreenState extends State<TaskScreen> {
                     }
                     await _selectDueDate(context);
                     if (dueDate != null) {
-                      Navigator.of(context).pop();
+                      Navigator.of(context).pop(); // Закрытие диалога после добавления
                       context.read<TaskBloc>().add(AddNewTask(
-                            title: titleController.text,
-                            description: descriptionController.text,
-                            dueDate: dueDate!,
-                          ));
-                      titleController.text = '';
-                      descriptionController.text = '';
+                        title: titleController.text,
+                        description: descriptionController.text,
+                        dueDate: dueDate!,
+                      ));
+                      titleController.clear(); // Очистка контроллеров
+                      descriptionController.clear();
                     }
                   },
-                  child: Text('Add task'),
+                  child: Text('Add task'), // Кнопка для добавления задачи
                 ),
               ],
             ),
@@ -118,70 +129,119 @@ class _TaskScreenState extends State<TaskScreen> {
     return BlocBuilder<TaskBloc, TaskState>(
       builder: (context, state) {
         if (state is TaskLoading) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator()); // Индикатор загрузки
         } else if (state is TaskSuccessLoad) {
-          final tasks = state.tasks;
+          final tasks = state.tasks; // Получение списка задач
+
           return Scaffold(
             appBar: AppBar(
-              title: Text('Tasks'),
+              title: Text('Tasks'), // Заголовок экрана
+              actions: [
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    context.read<TaskBloc>().add(FilterTasks(value)); // Фильтрация задач
+                  },
+                  itemBuilder: (context) {
+                    return {'All', 'Completed', 'Pending'}
+                        .map((String choice) {
+                      return PopupMenuItem<String>(
+                        value: choice,
+                        child: Text(choice),
+                      );
+                    }).toList();
+                  },
+                ),
+                IconButton(
+                  icon: Icon(sortByDate ? Icons.arrow_downward : Icons.arrow_upward),
+                  onPressed: () {
+                    setState(() {
+                      sortByDate = !sortByDate; // Переключение флага сортировки
+                    });
+                    context.read<TaskBloc>().add(SortTasks(sortByDate)); // Сортировка задач
+                  },
+                ),
+              ],
             ),
-            body: Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
-              child: ListView.builder(
-                itemCount: tasks.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      height: MediaQuery.of(context).size.height * 0.1,
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.green,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                tasks[index].title,
-                                style: TextStyle(fontSize: 25),
-                              ),
-                              Text(tasks[index].description),
-                              if (tasks[index].dueDate != null)
-                                Text(
-                                  'Due: ${DateFormat('dd-MM – kk:mm').format(tasks[index].dueDate!)}',
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                            ],
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              context
-                                  .read<TaskBloc>()
-                                  .add(DeleteTask(tasks[index].index));
-                            },
-                            icon: Icon(Icons.delete),
-                          ),
-                        ],
-                      ),
+            body: ListView.builder(
+              itemCount: tasks.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: !tasks[index].isDone ? Colors.lightGreenAccent : Colors.redAccent, // Цвет в зависимости от статуса задачи
                     ),
-                  );
-                },
-              ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (tasks[index].dueDate != null)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Due:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                Text(DateFormat('dd-MM').format(tasks[index].dueDate!), style: TextStyle(fontSize: 12)),
+                                Text(DateFormat('kk:mm').format(tasks[index].dueDate!), style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Checkbox(
+                                  activeColor: Colors.black,
+                                  value: tasks[index].isDone,
+                                  onChanged: (bool? value) {
+                                    context.read<TaskBloc>().add(UpdateTask(tasks[index].index)); // Обновление статуса задачи
+                                  },
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        tasks[index].title,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(
+                                        tasks[index].description,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    context.read<TaskBloc>().add(DeleteTask(tasks[index].index)); // Удаление задачи
+                                  },
+                                  icon: Icon(Icons.delete, color: Colors.black),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
             floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                _addingTask();
-              },
-              child: Icon(Icons.add),
+              backgroundColor: Colors.black,
+              onPressed: _addingTask, // Открытие диалога добавления задачи
+              child: Icon(Icons.add, color: Colors.white),
             ),
           );
         } else {
-          return Center(child: Text('Error loading tasks'));
+          return Center(child: Text('Error loading tasks')); // Обработка ошибок
         }
       },
     );

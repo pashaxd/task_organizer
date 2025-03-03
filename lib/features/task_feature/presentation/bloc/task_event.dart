@@ -15,3 +15,18 @@ class DeleteTask extends TaskEvent {
 
   DeleteTask( this.index);
 }
+class UpdateTask extends TaskEvent {
+  final int  index;
+
+  UpdateTask( this.index);
+}
+class FilterTasks extends TaskEvent {
+  final String filter;
+
+  FilterTasks(this.filter);
+}
+class SortTasks extends TaskEvent {
+  final bool sortByDate;
+
+  SortTasks(this.sortByDate);
+}

@@ -52,6 +52,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1001001295938',
     projectId: 'task-organizer-1f0ae',
     authDomain: 'task-organizer-1f0ae.firebaseapp.com',
+    databaseURL: 'https://task-organizer-1f0ae-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'task-organizer-1f0ae.firebasestorage.app',
     measurementId: 'G-Y44FS3CL1J',
   );
@@ -61,6 +62,7 @@ class DefaultFirebaseOptions {
     appId: '1:1001001295938:android:19ce21d7a7e1410fb84ddb',
     messagingSenderId: '1001001295938',
     projectId: 'task-organizer-1f0ae',
+    databaseURL: 'https://task-organizer-1f0ae-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'task-organizer-1f0ae.firebasestorage.app',
   );
 
@@ -69,7 +71,9 @@ class DefaultFirebaseOptions {
     appId: '1:1001001295938:ios:0e4f5a309efaf99bb84ddb',
     messagingSenderId: '1001001295938',
     projectId: 'task-organizer-1f0ae',
+    databaseURL: 'https://task-organizer-1f0ae-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'task-organizer-1f0ae.firebasestorage.app',
     iosBundleId: 'com.example.taskOrganizer',
   );
+
 }

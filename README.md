@@ -1,16 +1,34 @@
-# task_organizer
+# Task Organizer
 
-A new Flutter project.
+Task Organizer — это мобильное приложение для управления задачами, которое помогает вам организовывать свои дела, устанавливать сроки выполнения и получать уведомления о предстоящих задачах.
 
-## Getting Started
+## Основные функции
 
-This project is a starting point for a Flutter application.
+- **Создание задач**: Добавляйте задачи с названием, описанием и сроком выполнения.
+- **Управление задачами**: Отмечайте задачи как выполненные, редактируйте или удаляйте их.
+- **Фильтрация и сортировка**: Фильтруйте задачи по статусу (все, выполненные, невыполненные) и сортируйте их по дате.
+- **Уведомления**: Получайте уведомления о предстоящих задачах.
+- **Авторизация**: Регистрация и вход в систему для сохранения ваших задач.
 
-A few resources to get you started if this is your first Flutter project:
+## Технологии
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Flutter**: Основной фреймворк для разработки приложения.
+- **Firebase**: Используется для аутентификации и хранения данных (Firestore).
+- **Flutter BLoC**: Для управления состояниями.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+## Установка и настройка
+
+### Требования
+
+- Flutter SDK (версия 3.0.0 или выше)
+- Android Studio или Xcode (для сборки под Android/iOS)
+- Firebase project (для аутентификации и Firestore)
+
+### Шаги для запуска
+
+1. **Клонируйте репозиторий**:
+
+   ```bash
+   git clone https://github.com/pashaxd/task-organizer.git
+   cd task-organizer

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "1001001295938",
+    "firebase_url": "https://task-organizer-1f0ae-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "task-organizer-1f0ae",
     "storage_bucket": "task-organizer-1f0ae.firebasestorage.app"
   },
